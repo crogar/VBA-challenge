@@ -28,7 +28,17 @@ For each ws in wb.Sheets  'i is the variable used to iterate through sheets
 		If ws.Cells(row + 1, 1).value <> ws.Cells(row, 1).value Then
 			' Setting the <Ticker>
             ws.Cells(counter, 9).value = ws.Cells(row, 1).value
-			
+			' Setting the Yearly change total
+            ' WHERE ws.Cells(Row, 6).Value represents <close>
+            ws.Cells(counter, 10).value = ws.Cells(row, 6).value - temp_open
+            ' temporarily storing Yearly change
+            typt(0) = ws.Cells(row, 6).value - temp_open
+            'Styling Yearly change cell
+            If typt(0) < 0 Then
+                ws.Cells(counter, 10).Interior.Color = vbRed
+            Else
+                ws.Cells(counter, 10).Interior.Color = vbGreen
+            End If
 			
 			
 			            '*Re-asigning variables*
