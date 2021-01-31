@@ -39,7 +39,16 @@ For each ws in wb.Sheets  'i is the variable used to iterate through sheets
             Else
                 ws.Cells(counter, 10).Interior.Color = vbGreen
             End If
-			
+			' Setting The percent change from opening price at the beginning of a given year to the closing price at the end of that year.
+            If typt(0) = 0 Or temp_open = 0 Then
+                ws.Cells(counter, 11).value = 0
+                typt(1) = 0
+            Else
+                ws.Cells(counter, 11).value = typt(0) / temp_open
+                typt(1) = typt(0) / temp_open
+            End If
+            ' Setting The Total Stock Volume
+            ws.Cells(counter, 12).value = typt(2)
 			
 			            '*Re-asigning variables*
             typt(2) = 0        'total stock volume reset to 0
