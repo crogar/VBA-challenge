@@ -1,4 +1,4 @@
-sub main()
+Sub main()
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '                                Variable Declaration             '
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -15,20 +15,20 @@ Set wb = Workbooks("alphabetical_testing.xlsx") 'Setting this as our workbook
 first_opening = True  'Indicates that this would be the first "open" row when detecting a new ticker'
 counter = 2 'first Ticker will be printed in row 2'
 
-For each ws in wb.Sheets  'i is the variable used to iterate through sheets
-	ws.Cells.ClearFormats
-	
-	For row = 2 To get_lr(ws,1)
-		 typt(2) = typt(2) + ws.Cells(row, 7).Value2
+For Each ws In wb.Sheets  'i is the variable used to iterate through sheets
+    ws.Cells.ClearFormats
+    
+    For row = 2 To get_lr(ws, 1)
+         typt(2) = typt(2) + ws.Cells(row, 7).Value2
         'Start volumes up until we find a new Ticker!
         If first_opening = True Then
            temp_open = ws.Cells(row, 3).value
            first_opening = False
         End If
-		If ws.Cells(row + 1, 1).value <> ws.Cells(row, 1).value Then
-			' Setting the <Ticker>
+        If ws.Cells(row + 1, 1).value <> ws.Cells(row, 1).value Then
+            ' Setting the <Ticker>
             ws.Cells(counter, 9).value = ws.Cells(row, 1).value
-			' Setting the Yearly change total
+            ' Setting the Yearly change total
             ' WHERE ws.Cells(Row, 6).Value represents <close>
             ws.Cells(counter, 10).value = ws.Cells(row, 6).value - temp_open
             ' temporarily storing Yearly change
@@ -39,7 +39,7 @@ For each ws in wb.Sheets  'i is the variable used to iterate through sheets
             Else
                 ws.Cells(counter, 10).Interior.Color = vbGreen
             End If
-			' Setting The percent change from opening price at the beginning of a given year to the closing price at the end of that year.
+            ' Setting The percent change from opening price at the beginning of a given year to the closing price at the end of that year.
             If typt(0) = 0 Or temp_open = 0 Then
                 ws.Cells(counter, 11).value = 0
                 typt(1) = 0
@@ -49,16 +49,18 @@ For each ws in wb.Sheets  'i is the variable used to iterate through sheets
             End If
             ' Setting The Total Stock Volume
             ws.Cells(counter, 12).value = typt(2)
-			
-			            '*Re-asigning variables*
+            
+                        '*Re-asigning variables*
             typt(2) = 0        'total stock volume reset to 0
             counter = counter + 1   'adding 1, next company
             first_opening = Not first_opening   'this will help resetting our
-		endif
-		
-	next row
-	counter = 2
-next ws
+        End If
+        
+    Next row
+    counter = 2
+    Call bonus_analysis(ws)
+    Call styling(ws)
+Next ws
 
 End Sub
 
@@ -75,8 +77,8 @@ Dim lRow As Long
     get_lr = lRow
 End Function
 
-'Subroutine that prints "ticker,Yearly Change, Percent Change, Total Stock volume"
-Sub title_columns(ws_)
+'Subroutine that styles the worksheets
+Sub styling(ws_)
     Dim lr As Integer: lr = get_lr(ws_, 9)
     ws_.Cells(1, 9).value = "Ticker"
     ws_.Cells(1, 10).value = "Yearly Change"
@@ -85,3 +87,55 @@ Sub title_columns(ws_)
     ws_.Range("K2:K" & lr).NumberFormat = "0.00%"
     ws_.Columns("O").AutoFit
 End Sub
+
+'*******************************************************************
+'                         Bonus                                   *
+'*****************************************************************
+'Subroutine that calculates "Greatest % increase", "Greatest % decrease" and "Greatest total volume"
+Sub bonus_analysis(ws_)
+'obtaining the last non-blank cell on J column
+Dim lr As Integer: lr = get_lr(ws_, 9)
+
+ws_.Range("P1").value = "Ticker"
+ws_.Range("Q1").value = "Value"
+ws_.Range("O2").value = "Greatest % increase"
+ws_.Range("O3").value = "Greatest % decrease"
+ws_.Range("O4").value = "Greatest total volume"
+
+'Formatting Values in the following range to be shown as Percentage
+ws_.Range("Q2:Q3").NumberFormat = "0.00%"
+'obtaining Greatest % Increase
+Set Rng = ws_.Range("K2:K" & lr)
+ws_.Range("Q2").value = Application.WorksheetFunction.Max(Rng)
+'Setting the corresponding value for Ticker
+ws_.Range("P2").value = find_ticker(ws_, "K", ws_.Range("Q2").Value2)
+'obtaining Greatest % decrease
+Set Rng = ws_.Range("K2:K" & lr)
+ws_.Range("Q3").value = Application.WorksheetFunction.Min(Rng)
+'Setting the corresponding ticker for Greatest % decrease
+ws_.Range("P3").value = find_ticker(ws_, "K", ws_.Range("Q3").Value2)
+'obtaining Greatest total volume
+Set Rng = ws_.Range("L2:L" & lr)
+ws_.Range("Q4").value = Application.WorksheetFunction.Max(Rng)
+'Setting the corresponding ticker for Greatest % decrease
+ws_.Range("P4").value = find_ticker(ws_, "L", ws_.Range("Q4").Value2)
+
+End Sub
+
+'This Function is used to find a specific value in a given range
+'and it returns the row where that value was found, otherwise will
+'show "Ticker not found" in a msgbox
+Private Function find_ticker(ws_, col As String, value As Variant) As String
+Dim row As Integer: row = get_lr(ws_, 9)
+Dim L_row As Long
+Set rgFound = ws_.Range(col & "2:" & col & row).Find(value)
+
+If Not rgFound Is Nothing Then
+    L_row = rgFound.row
+    find_ticker = ws_.Range("I" & L_row).Value2
+Else
+    MsgBox "Ticker not found"
+End If
+
+End Function
+
