@@ -17,7 +17,10 @@ counter = 2 'first Ticker will be printed in row 2'
 
 For each ws in wb.Sheets  'i is the variable used to iterate through sheets
 	ws.Cells.ClearFormats
-  msgbox(ws.name)
+	
+	For row = 2 To get_lr(ws, i, 1)
+	
+	next row
 next ws
 
 End Sub
