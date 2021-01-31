@@ -18,9 +18,27 @@ counter = 2 'first Ticker will be printed in row 2'
 For each ws in wb.Sheets  'i is the variable used to iterate through sheets
 	ws.Cells.ClearFormats
 	
-	For row = 2 To get_lr(ws, i, 1)
-	
+	For row = 2 To get_lr(ws,1)
+		 typt(2) = typt(2) + ws.Cells(row, 7).Value2
+        'Start volumes up until we find a new Ticker!
+        If first_opening = True Then
+           temp_open = ws.Cells(row, 3).value
+           first_opening = False
+        End If
+		If ws.Cells(row + 1, 1).value <> ws.Cells(row, 1).value Then
+			' Setting the <Ticker>
+            ws.Cells(counter, 9).value = ws.Cells(row, 1).value
+			
+			
+			
+			            '*Re-asigning variables*
+            typt(2) = 0        'total stock volume reset to 0
+            counter = counter + 1   'adding 1, next company
+            first_opening = Not first_opening   'this will help resetting our
+		endif
+		
 	next row
+	counter = 2
 next ws
 
 End Sub
@@ -30,7 +48,7 @@ End Sub
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 'Function that finds and return the last non-blank cell in column A(1)
-Private Function get_lr(ws_ As Workbook, SN_, col) As Long
+Private Function get_lr(ws_, col) As Long
 'SN_ represents the sheet number and col represents the column to use as
 'reference
 Dim lRow As Long
