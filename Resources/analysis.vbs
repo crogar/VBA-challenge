@@ -74,3 +74,14 @@ Dim lRow As Long
     lRow = ws_.Cells(Rows.Count, col).End(xlUp).row
     get_lr = lRow
 End Function
+
+'Subroutine that prints "ticker,Yearly Change, Percent Change, Total Stock volume"
+Sub title_columns(ws_)
+    Dim lr As Integer: lr = get_lr(ws_, 9)
+    ws_.Cells(1, 9).value = "Ticker"
+    ws_.Cells(1, 10).value = "Yearly Change"
+    ws_.Cells(1, 11).value = "Percent Change"
+    ws_.Cells(1, 12).value = "Total Stock volume"
+    ws_.Range("K2:K" & lr).NumberFormat = "0.00%"
+    ws_.Columns("O").AutoFit
+End Sub
